@@ -5,6 +5,8 @@ import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
+import BookDetail from "./pages/BookDetail"; // Импортируем компонент для отображения книги
+import FilterPage from "./pages/FilterPage";
 
 const App = () => {
   return (
@@ -15,6 +17,8 @@ const App = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/books/:id" element={<BookDetail />} /> {/* Добавляем маршрут для страницы книги */}
+          <Route path="/filter" element={<FilterPage />} />
         </Routes>
       </Container>
     </Router>
