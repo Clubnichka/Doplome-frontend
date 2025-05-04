@@ -1,0 +1,10 @@
+.navbar .nav-left .logo-link {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .navbar .nav-left h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
