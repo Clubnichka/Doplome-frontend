@@ -1,4 +1,5 @@
 .home-container {
+    padding-top: 80px; /* чтобы контент не был перекрыт navbar'ом */
     font-family: Arial, sans-serif;
   }
   

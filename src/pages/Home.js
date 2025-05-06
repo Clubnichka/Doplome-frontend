@@ -86,32 +86,32 @@ const Home = () => {
           />
         </div>
         <div className="nav-right">
-        <Button as={Link} to="/filter" variant="outline-light">Фильтр</Button>
-        {user ? (
-  <>
-    <span>👤 {user.sub}</span>
-    {isAdmin && (
-      <Button variant="outline-warning" as={Link} to="/admin">
-        Панель админа
-      </Button>
-    )}
-    <Button variant="outline-danger" onClick={() => {
-      document.cookie = "token=; Max-Age=0; path=/"; // удаление токена
-      window.location.reload(); // перезагрузка страницы
-    }}>
-      Выйти
-    </Button>
-  </>
-) : (
-  <>
-    <Button variant="outline-light" as={Link} to="/login">
-      Вход
-    </Button>
-    <Button variant="outline-light" as={Link} to="/signup">
-      Регистрация
-    </Button>
-  </>
-)}
+          <Button as={Link} to="/filter" variant="outline-light">Фильтр</Button>
+          {user ? (
+            <>
+              <span>👤 {user.sub}</span>
+              {isAdmin && (
+                <Button variant="outline-warning" as={Link} to="/admin">
+                  Панель админа
+                </Button>
+              )}
+              <Button variant="outline-danger" onClick={() => {
+                document.cookie = "token=; Max-Age=0; path=/"; // удаление токена
+                window.location.reload(); // перезагрузка страницы
+              }}>
+                Выйти
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline-light" as={Link} to="/login">
+                Вход
+              </Button>
+              <Button variant="outline-light" as={Link} to="/signup">
+                Регистрация
+              </Button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -125,6 +125,17 @@ const Home = () => {
                 <div key={book.id} className="book-card">
                   <h4>{book.title}</h4>
                   <p>{book.author}</p>
+                  {/* Отображаем теги книги */}
+                  {book.tags && book.tags.length > 0 && (
+                    <div>
+                      <strong>Теги:</strong>
+                      <ul>
+                        {book.tags.map((tag, index) => (
+                          <li key={index}>{tag.name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   <Link to={`/books/${book.id}`}>Читать</Link>
                 </div>
               ))}

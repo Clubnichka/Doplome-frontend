@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import api from "../services/api";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar"; // Импорт навигации
 
 // Функция для извлечения токена из куки
 const getTokenFromCookies = () => {
@@ -23,8 +25,17 @@ const AdminPanel = () => {
     publisher: "",
     releaseDate: "",
     genre: "",
-    pdf: null,  // Добавляем состояние для файла
+    pdf: null,
   });
+
+  const [availableTags, setAvailableTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  useEffect(() => {
+    api.get("/tags") // предположим, что такой endpoint существует
+      .then((response) => setAvailableTags(response.data))
+      .catch((error) => console.error("Ошибка при получении тегов:", error));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,34 +48,43 @@ const AdminPanel = () => {
   const handleFileChange = (e) => {
     setNewBook({
       ...newBook,
-      pdf: e.target.files[0],  // Сохраняем выбранный файл PDF
+      pdf: e.target.files[0],
     });
+  };
+
+  const handleTagChange = (e) => {
+    const tag = e.target.value;
+    setSelectedTags((prev) =>
+      e.target.checked ? [...prev, tag] : prev.filter((t) => t !== tag)
+    );
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const token = getTokenFromCookies(); // Получаем токен из cookie
-
+    const token = getTokenFromCookies();
     if (!token) {
       alert("You must be logged in as admin to add a book");
       return;
     }
 
-    // Создаем FormData для отправки данных книги и файла
     const formData = new FormData();
     formData.append("title", newBook.title);
     formData.append("author", newBook.author);
     formData.append("publisher", newBook.publisher);
     formData.append("releaseDate", newBook.releaseDate);
     formData.append("genre", newBook.genre);
-    formData.append("file", newBook.pdf);  // Добавляем файл в форму
+    formData.append("file", newBook.pdf);
+
+    selectedTags.forEach((tag) => {
+      formData.append("tags", tag); // multiple tags with same key
+    });
 
     api
       .post("/books", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",  // Указываем, что отправляем форму с файлом
+          "Content-Type": "multipart/form-data",
         },
       })
       .then(() => alert("Book added successfully!"))
@@ -75,52 +95,36 @@ const AdminPanel = () => {
   };
 
   return (
+    
     <div>
+      <Navbar/>
       <h1>Admin Panel</h1>
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={newBook.title}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="author"
-          placeholder="Author"
-          value={newBook.author}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="publisher"
-          placeholder="Publisher"
-          value={newBook.publisher}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="releaseDate"
-          placeholder="Release Date"
-          value={newBook.releaseDate}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="genre"
-          placeholder="Genre"
-          value={newBook.genre}
-          onChange={handleChange}
-        />
-        <input
-          type="file"
-          name="file"
-          accept="application/pdf"
-          onChange={handleFileChange}
-        />
+        <input type="text" name="title" placeholder="Title" value={newBook.title} onChange={handleChange} />
+        <input type="text" name="author" placeholder="Author" value={newBook.author} onChange={handleChange} />
+        <input type="text" name="publisher" placeholder="Publisher" value={newBook.publisher} onChange={handleChange} />
+        <input type="text" name="releaseDate" placeholder="Release Date" value={newBook.releaseDate} onChange={handleChange} />
+        <input type="text" name="genre" placeholder="Genre" value={newBook.genre} onChange={handleChange} />
+        <input type="file" name="file" accept="application/pdf" onChange={handleFileChange} />
+
+        <div>
+  <p>Tags:</p>
+  {availableTags.map((tag) => (
+    <label key={tag}>
+      <input
+        type="checkbox"
+        value={tag}
+        checked={selectedTags.includes(tag)}
+        onChange={handleTagChange}
+      />
+      {tag}
+    </label>
+  ))}
+</div>
+
         <button type="submit">Add Book</button>
       </form>
+      <Footer/>
     </div>
   );
 };
