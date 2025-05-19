@@ -11,54 +11,86 @@ const getCookie = (name) => {
 };
 
 const BookDetail = () => {
-  const { id } = useParams(); // Получаем id книги из URL
+  const { id } = useParams();
   const [book, setBook] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [bookingMessage, setBookingMessage] = useState("");
 
   useEffect(() => {
-    const token = getCookie("token"); // Получаем токен из cookies
-
-    // Если токен отсутствует, выходим (или показываем ошибку)
+    const token = getCookie("token");
     if (!token) {
       console.error("No token found");
       return;
     }
 
-    // Загружаем книгу
+    // Загружаем информацию о книге
     axios.get(`http://localhost:8080/books/${id}`, {
-      headers: { Authorization: `Bearer ${token}` }, // Добавляем токен в заголовок
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => setBook(response.data))
-      .catch(error => console.error("There was an error fetching the book!", error));
+      .catch(error => console.error("Ошибка при получении данных о книге", error));
 
-    // Запрос для получения PDF-файла
+    // Загружаем PDF и подготавливаем URL
     axios.get(`http://localhost:8080/books/${id}/read`, {
-      headers: { Authorization: `Bearer ${token}` }, // Добавляем токен в заголовок
+      headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob',
     })
       .then(response => {
         const file = new Blob([response.data], { type: 'application/pdf' });
         setPdfUrl(URL.createObjectURL(file));
       })
-      .catch(error => console.error("Error fetching PDF file:", error));
+      .catch(error => console.error("Ошибка при загрузке PDF", error));
   }, [id]);
 
-  if (!book) return <div>Loading...</div>;
+  const handleBooking = async () => {
+    const token = getCookie("token");
+    if (!token) {
+      setBookingMessage("Авторизуйтесь для бронирования книги.");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/bookings",
+        { bookId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+      setBookingMessage("Книга успешно забронирована!");
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setBookingMessage(error.response.data);
+      } else {
+        setBookingMessage("Произошла ошибка при бронировании.");
+      }
+    }
+  };
+
+  if (!book) return <div>Загрузка...</div>;
 
   return (
     <div>
       <h1>{book.title}</h1>
-      <p>{book.author}</p>
-      <p>{book.publisher}</p>
-      <p>{book.genre}</p>
-      <p>{book.releaseDate}</p>
+      <p>Автор: {book.author}</p>
+      <p>Издатель: {book.publisher}</p>
+      <p>Жанр: {book.genre}</p>
+      <p>Дата выхода: {book.releaseDate}</p>
+      <p>Местоположение: {book.location}</p>
+      <p>Доступно экземпляров: {book.availableCopies}</p>
 
-      {/* Отображаем PDF через object */}
+      <button onClick={handleBooking}>Забронировать</button>
+
       {pdfUrl && (
-        <object data={pdfUrl} type="application/pdf" width="100%" height="600px">
-          <p>PDF не поддерживается в вашем браузере.</p>
-        </object>
+        <button onClick={() => window.open(pdfUrl, "_blank")}>
+          Читать
+        </button>
       )}
+
+      {bookingMessage && <p>{bookingMessage}</p>}
     </div>
   );
 };

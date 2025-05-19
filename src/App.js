@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import AdminPanel from "./pages/AdminPanel";
 import BookDetail from "./pages/BookDetail"; // Импортируем компонент для отображения книги
 import FilterPage from "./pages/FilterPage";
+import FilterResults from "./pages/FilterResults";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/books/:id" element={<BookDetail />} /> {/* Добавляем маршрут для страницы книги */}
           <Route path="/filter" element={<FilterPage />} />
+          <Route path="/filter-results" element={<FilterResults />} />
         </Routes>
       </Container>
     </Router>

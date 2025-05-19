@@ -3,7 +3,7 @@ import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar"; // Импорт навигации
 
-const genres = ["Фантастика", "Детектив", "Роман", "История", "Наука", "Поэзия"];
+const genres = ["Фантастика", "Детектив", "Роман", "История", "Наука", "Поэзия","Фентези"];
 
 const FilterPage = () => {
   const [selectedGenres, setSelectedGenres] = useState([]);
@@ -19,9 +19,21 @@ const FilterPage = () => {
     );
   };
 
+const availableTags = ["научная","психология","классика", "приключения", "мистика", "юмор", "философия","фантастика","художественная","бестселлер"];
+
+const [selectedTags, setSelectedTags] = useState([]);
+
+const toggleTag = (tag) => {
+  setSelectedTags((prev) =>
+    prev.includes(tag)
+      ? prev.filter((t) => t !== tag)
+      : [...prev, tag]
+  );
+};
   const handleSearch = () => {
     const queryParams = new URLSearchParams();
     if (selectedGenres.length > 0) queryParams.append("genres", selectedGenres.join(","));
+    if (selectedTags.length > 0) queryParams.append("tags", selectedTags.join(","));
     if (author) queryParams.append("author", author);
     if (yearFrom) queryParams.append("yearFrom", yearFrom);
     if (yearTo) queryParams.append("yearTo", yearTo);
@@ -49,7 +61,21 @@ const FilterPage = () => {
               ))}
             </Row>
           </Form.Group>
-
+          <Form.Group className="mt-3">
+          <Form.Label>Теги:</Form.Label>
+          <Row>
+            {availableTags.map((tag) => (
+              <Col xs={6} md={4} key={tag}>
+                <Form.Check
+                  type="checkbox"
+                  label={tag}
+                  checked={selectedTags.includes(tag)}
+                  onChange={() => toggleTag(tag)}
+                />
+              </Col>
+            ))}
+          </Row>
+        </Form.Group>
           <Form.Group className="mt-3">
             <Form.Label>Автор:</Form.Label>
             <Form.Control
