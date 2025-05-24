@@ -19,6 +19,7 @@ const getTokenFromCookies = () => {
 };
 
 const AdminPanel = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [newBook, setNewBook] = useState({
     title: "",
     author: "",
@@ -97,7 +98,7 @@ const AdminPanel = () => {
   return (
     
     <div>
-      <Navbar/>
+      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <h1>Admin Panel</h1>
       <form onSubmit={handleSubmit}>
         <input type="text" name="title" placeholder="Title" value={newBook.title} onChange={handleChange} />

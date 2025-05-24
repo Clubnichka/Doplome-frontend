@@ -14,6 +14,7 @@ const getCookie = (name) => {
 };
 
 const FilterResults = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const location = useLocation();
   const [books, setBooks] = useState([]);
   const [total, setTotal] = useState(0);
@@ -48,7 +49,7 @@ const FilterResults = () => {
 
   return (
     <>
-      <Navbar />
+      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <Container className="mt-5 mb-5">
         <h2>Результаты фильтрации ({total})</h2>
 

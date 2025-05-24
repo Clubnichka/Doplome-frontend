@@ -4,10 +4,14 @@ import { Container } from "react-bootstrap";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Login from "./pages/Login";
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanelMenu from "./pages/AdminPanelMenu";
+import AddBookPage from "./pages/AddBookPage";
+import UserListPage from "./pages/UserListPage";
+import ActiveReservationsPage from "./pages/ActiveReservationsPage";
 import BookDetail from "./pages/BookDetail"; // Импортируем компонент для отображения книги
 import FilterPage from "./pages/FilterPage";
 import FilterResults from "./pages/FilterResults";
+import SearchResults from "./pages/SearchResults";
 
 const App = () => {
   return (
@@ -17,10 +21,14 @@ const App = () => {
           <Route path="/" element={<Home />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/admin" element={<AdminPanelMenu/>} />
+          <Route path="/admin/add-book" element={<AddBookPage />} />
+          <Route path="/admin/users" element={<UserListPage />} />
+          <Route path="/admin/reservations" element={<ActiveReservationsPage />} />
           <Route path="/books/:id" element={<BookDetail />} /> {/* Добавляем маршрут для страницы книги */}
           <Route path="/filter" element={<FilterPage />} />
           <Route path="/filter-results" element={<FilterResults />} />
+          <Route path="/search" element={<SearchResults />} />
         </Routes>
       </Container>
     </Router>

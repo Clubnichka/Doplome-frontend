@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar"; // Импорт навигации
 
 // Функция для получения токена из куки
 const getCookie = (name) => {
@@ -11,6 +13,7 @@ const getCookie = (name) => {
 };
 
 const BookDetail = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const { id } = useParams();
   const [book, setBook] = useState(null);
   const [pdfUrl, setPdfUrl] = useState(null);
@@ -74,6 +77,7 @@ const BookDetail = () => {
 
   return (
     <div>
+      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <h1>{book.title}</h1>
       <p>Автор: {book.author}</p>
       <p>Издатель: {book.publisher}</p>
@@ -91,6 +95,7 @@ const BookDetail = () => {
       )}
 
       {bookingMessage && <p>{bookingMessage}</p>}
+      <Footer />
     </div>
   );
 };

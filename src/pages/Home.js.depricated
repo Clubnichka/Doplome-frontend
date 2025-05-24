@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import api from "../services/api";
 import "./Home.css"; // файл со стилями, создадим его отдельно
-import Footer from "../components/Footer";
-import Navbar from "../components/Navbar"; // Импорт навигации
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -74,7 +72,48 @@ const Home = () => {
   return (
     <div className="home-container">
       {/* Навигационная панель */}
-      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <nav className="navbar">
+        <div className="nav-left">
+          <h2>📚 eLibrary</h2>
+        </div>
+        <div className="nav-center">
+          <input
+            type="text"
+            placeholder="Поиск книги..."
+            className="search-bar"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="nav-right">
+          <Button as={Link} to="/filter" variant="outline-light">Фильтр</Button>
+          {user ? (
+            <>
+              <span>👤 {user.sub}</span>
+              {isAdmin && (
+                <Button variant="outline-warning" as={Link} to="/admin">
+                  Панель админа
+                </Button>
+              )}
+              <Button variant="outline-danger" onClick={() => {
+                document.cookie = "token=; Max-Age=0; path=/"; // удаление токена
+                window.location.reload(); // перезагрузка страницы
+              }}>
+                Выйти
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline-light" as={Link} to="/login">
+                Вход
+              </Button>
+              <Button variant="outline-light" as={Link} to="/signup">
+                Регистрация
+              </Button>
+            </>
+          )}
+        </div>
+      </nav>
 
       {/* Книги */}
       <div className="genres-container">
@@ -105,7 +144,10 @@ const Home = () => {
         ))}
       </div>
 
-      <Footer/>
+      {/* Футер */}
+      <footer className="footer">
+        <p>Проект электронная библиотека, автор — Лебедев А.Д.</p>
+      </footer>
     </div>
   );
 };

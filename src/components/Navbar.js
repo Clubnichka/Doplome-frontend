@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
-import "./Navbar.css"; // Стили для Navbar
+import "./Navbar.css";
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -27,6 +27,7 @@ const parseJwt = (token) => {
 };
 
 const Navbar = ({ searchTerm, setSearchTerm }) => {
+  const navigate = useNavigate();
   const token = getCookie("token");
   const decoded = token ? parseJwt(token) : null;
   const isAdmin = decoded?.role === "ADMIN";
@@ -34,6 +35,12 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
   const handleLogout = () => {
     document.cookie = "token=; Max-Age=0; path=/";
     window.location.reload();
+  };
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+    }
   };
 
   return (
@@ -50,6 +57,7 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
           className="search-bar"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleSearch}
         />
       </div>
       <div className="nav-right">

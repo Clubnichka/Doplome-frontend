@@ -6,6 +6,7 @@ import Navbar from "../components/Navbar"; // Импорт навигации
 const genres = ["Фантастика", "Детектив", "Роман", "История", "Наука", "Поэзия","Фентези"];
 
 const FilterPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [author, setAuthor] = useState("");
   const [yearFrom, setYearFrom] = useState("");
@@ -42,7 +43,7 @@ const toggleTag = (tag) => {
 
   return (
     <>
-      <Navbar /> {/* Навигационная панель */}
+      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       <Container className="mt-5 mb-5">
         <h2>Фильтрация каталога</h2>
         <Form>
