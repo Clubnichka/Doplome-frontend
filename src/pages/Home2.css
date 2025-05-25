@@ -1,0 +1,53 @@
+.home-container {
+  padding: 40px 80px;
+  font-family: "Segoe UI", sans-serif;
+  background-color: #f9f9f9;
+}
+
+.genre-section {
+  margin-bottom: 50px;
+}
+
+.section-title {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+}
+
+.book-row {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 10px;
+}
+
+.book-card {
+  min-width: 160px;
+  max-width: 160px;
+  text-decoration: none;
+  color: #000;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  padding: 10px;
+  text-align: center;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+}
+
+.cover-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.book-title {
+  margin-top: 10px;
+  font-size: 1rem;
+  font-weight: 500;
+}

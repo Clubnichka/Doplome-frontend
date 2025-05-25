@@ -1,0 +1,61 @@
+.book-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+    justify-content: center;
+    padding: 0 20px;
+  }
+  
+  .book-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-width: 320px; /* ограничим ширину */
+    margin: 0 auto;
+  }
+  
+  .book-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+  }
+  
+  .book-cover {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  .cover-img {
+    max-height: 180px;
+    width: auto;
+    max-width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  .pagination-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 40px;
+  }
+  
+  .page-btn.active-page {
+    font-weight: bold;
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+  }
+  .cover-img {
+    max-height: 160px;
+    width: auto;
+    max-width: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+  }

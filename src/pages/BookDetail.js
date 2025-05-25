@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar"; // Импорт навигации
+import "./BookDetail.css"; // Стили отдельно
 
-// Функция для получения токена из куки
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -26,14 +26,12 @@ const BookDetail = () => {
       return;
     }
 
-    // Загружаем информацию о книге
     axios.get(`http://localhost:8080/books/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(response => setBook(response.data))
       .catch(error => console.error("Ошибка при получении данных о книге", error));
 
-    // Загружаем PDF и подготавливаем URL
     axios.get(`http://localhost:8080/books/${id}/read`, {
       headers: { Authorization: `Bearer ${token}` },
       responseType: 'blob',
@@ -53,7 +51,7 @@ const BookDetail = () => {
     }
 
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8080/api/bookings",
         { bookId: id },
         {
@@ -76,27 +74,57 @@ const BookDetail = () => {
   if (!book) return <div>Загрузка...</div>;
 
   return (
-    <div>
+    <>
       <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <h1>{book.title}</h1>
-      <p>Автор: {book.author}</p>
-      <p>Издатель: {book.publisher}</p>
-      <p>Жанр: {book.genre}</p>
-      <p>Дата выхода: {book.releaseDate}</p>
-      <p>Местоположение: {book.location}</p>
-      <p>Доступно экземпляров: {book.availableCopies}</p>
+      <div className="book-detail-container">
+        <div className="book-info-card">
+          <div className="cover-wrapper">
+          {book.coverImage ? (
+            <img
+              src={`data:image/jpeg;base64,${book.coverImage}`}
+              alt="Обложка"
+              className="book-detail-cover"
+            />
+          ) : (
+            <div className="book-detail-cover placeholder">Нет обложки</div>
+          )}
+          </div>
 
-      <button onClick={handleBooking}>Забронировать</button>
+          <div className="book-meta">
+            <h2>{book.title}</h2>
+            <p><strong>Автор:</strong> {book.author}</p>
+            <p><strong>Издатель:</strong> {book.publisher}</p>
+            <p><strong>Жанр:</strong> {book.genre}</p>
+            <p><strong>Дата выхода:</strong> {book.releaseDate}</p>
+            <p><strong>Местоположение:</strong> {book.location}</p>
+            <p><strong>Доступно экземпляров:</strong> {book.availableCopies}</p>
 
-      {pdfUrl && (
-        <button onClick={() => window.open(pdfUrl, "_blank")}>
-          Читать
-        </button>
-      )}
+            <div className="book-buttons">
+              <button className="book-btn" onClick={handleBooking}>Забронировать</button>
+              {pdfUrl && (
+                <button className="book-btn read-btn" onClick={() => window.open(pdfUrl, "_blank")}>
+                  Читать
+                </button>
+              )}
+            </div>
 
-      {bookingMessage && <p>{bookingMessage}</p>}
+            {bookingMessage && <p className="booking-message">{bookingMessage}</p>}
+
+            {book.tags && book.tags.length > 0 && (
+              <div className="tag-section">
+                <h5>Теги:</h5>
+                <div className="tag-list">
+                  {book.tags.map((tag, index) => (
+                    <span key={index} className="tag-item">{tag.name}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
       <Footer />
-    </div>
+    </>
   );
 };
 

@@ -1,0 +1,99 @@
+.book-detail-container {
+    padding: 40px 80px;
+    background-color: #f9f9f9;
+    font-family: "Segoe UI", sans-serif;
+  }
+  
+  .book-info-card {
+    display: flex;
+    gap: 40px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+  }
+  
+  .cover-wrapper {
+    flex-shrink: 0;
+    width: 280px;
+  }
+  
+  .detail-cover-img {
+    width: 280px;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #eaeaea;
+  }
+  .book-detail-cover {
+    width: 280px;
+    height: 380px;
+    object-fit: cover;
+    border-radius: 12px;
+    background-color: #eaeaea;
+  }
+  .book-meta {
+    flex-grow: 1;
+  }
+  
+  .book-meta h2 {
+    margin-bottom: 20px;
+  }
+  
+  .book-meta p {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: #333;
+  }
+  
+  .book-buttons {
+    margin-top: 20px;
+  }
+  
+  .book-btn {
+    margin-right: 12px;
+    padding: 10px 20px;
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  
+  .book-btn:hover {
+    background-color: #125aa3;
+  }
+  
+  .read-btn {
+    background-color: #4caf50;
+  }
+  
+  .read-btn:hover {
+    background-color: #388e3c;
+  }
+  
+  .booking-message {
+    margin-top: 12px;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .tag-section {
+    margin-top: 25px;
+  }
+  
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  
+  .tag-item {
+    background-color: #e0f7fa;
+    color: #00796b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+  }

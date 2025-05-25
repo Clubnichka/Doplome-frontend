@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { Button } from "react-bootstrap";
 import api from "../services/api";
-import "./Home.css"; // файл со стилями, создадим его отдельно
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar"; // Импорт навигации
+import "./Home2.css";
 
 const getCookie = (name) => {
   const value = `; ${document.cookie}`;
@@ -31,82 +31,92 @@ const parseJwt = (token) => {
 };
 
 const Home = () => {
-  const [books, setBooks] = useState([]);
-  const [user, setUser] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [tokenMissing, setTokenMissing] = useState(false);
+  const [recommendations, setRecommendations] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    api.get("/books")
-      .then((response) => setBooks(response.data))
-      .catch((error) => console.error("Error fetching books:", error));
-
     const token = getCookie("token");
     if (token) {
       const decoded = parseJwt(token);
       if (decoded) {
-        setUser(decoded);
-        if (decoded.role === "ADMIN") setIsAdmin(true);
+        api
+          .get("/recommendations", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((response) => setRecommendations(response.data))
+          .catch((error) =>
+            console.error("Error fetching recommendations:", error)
+          );
       }
-    } else {
-      setTokenMissing(true);
     }
   }, []);
 
-  // Группировка книг по жанрам
-  const groupedBooks = books.reduce((acc, book) => {
-    const genre = book.genre || "Unknown";
-    acc[genre] = acc[genre] || [];
-    acc[genre].push(book);
-    return acc;
-  }, {});
-
-  const filteredBooks = Object.fromEntries(
-    Object.entries(groupedBooks).map(([genre, books]) => [
-      genre,
-      books.filter(book =>
+  const filterBooks = (books) =>
+    books
+      .filter((book) =>
         book.title.toLowerCase().includes(searchTerm.toLowerCase())
       )
-    ])
-  );
+      .slice(0, 10);
+
+  const formatExamples = (examples) => {
+    if (!examples || examples.length === 0) return "";
+    return ` (${examples.slice(0, 3).join(", ")})`;
+  };
 
   return (
-    <div className="home-container">
-      {/* Навигационная панель */}
+    <>
       <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <h2 >
+          Найдено книг: 
+        </h2>
+      <Container className="mt-5 mb-5" style={{ fontFamily: "Segoe UI, sans-serif" }}>
+        {Object.entries(recommendations).map(([category, data]) => {
+          const books = data.books || [];
+          const examples =
+            category === "По жанрам"
+              ? data.genres
+              : category === "По авторам"
+              ? data.authors
+              : data.tags;
 
-      {/* Книги */}
-      <div className="genres-container">
-        {Object.entries(filteredBooks).map(([genre, books]) => (
-          <div key={genre} className="genre-section">
-            <h3>{genre}</h3>
-            <div className="book-row">
-              {books.map((book) => (
-                <div key={book.id} className="book-card">
-                  <h4>{book.title}</h4>
-                  <p>{book.author}</p>
-                  {/* Отображаем теги книги */}
-                  {book.tags && book.tags.length > 0 && (
-                    <div>
-                      <strong>Теги:</strong>
-                      <ul>
-                        {book.tags.map((tag, index) => (
-                          <li key={index}>{tag.name}</li>
-                        ))}
-                      </ul>
+          return (
+            <div key={category} className="genre-section mb-5">
+              <h3 className="text-center mb-4">
+                Рекомендации {category.toLowerCase()}
+                {formatExamples(examples)}
+              </h3>
+              <div className="book-grid">
+                {filterBooks(books).map((book) => (
+                  <Link
+                    to={`/books/${book.id}`}
+                    key={book.id}
+                    className="book-card"
+                  >
+                    <div className="book-cover">
+                      {book.coverBase64 ? (
+                        <img
+                          src={`data:image/jpeg;base64,${book.coverBase64}`}
+                          alt="Обложка"
+                          className="cover-img"
+                        />
+                      ) : (
+                        <img
+                          src="/placeholder.png"
+                          alt="Заглушка"
+                          className="cover-img"
+                        />
+                      )}
                     </div>
-                  )}
-                  <Link to={`/books/${book.id}`}>Читать</Link>
-                </div>
-              ))}
+                    <h5 className="text-center mt-2">{book.title}</h5>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-
-      <Footer/>
-    </div>
+          );
+        })}
+      </Container>
+      <Footer />
+    </>
   );
 };
 
