@@ -12,6 +12,8 @@ import BookDetail from "./pages/BookDetail"; // Импортируем комп�
 import FilterPage from "./pages/FilterPage";
 import FilterResults from "./pages/FilterResults";
 import SearchResults from "./pages/SearchResults";
+import EditBookPage from "./pages/EditBookPage";
+import MyBookingsPage from "./pages/MyBookingPage";
 
 const App = () => {
   return (
@@ -29,6 +31,8 @@ const App = () => {
           <Route path="/filter" element={<FilterPage />} />
           <Route path="/filter-results" element={<FilterResults />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/books/:id/edit" element={<EditBookPage />} />
+          <Route path="/my-bookings" element={<MyBookingsPage/>}/>
         </Routes>
       </Container>
     </Router>

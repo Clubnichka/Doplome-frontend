@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import "./AdminPages.css";
 
 // Функция для получения токена из cookie
 const getCookie = (name) => {
@@ -42,12 +43,15 @@ const UserListPage = () => {
   return (
     <div className="d-flex flex-column min-vh-100 bg-white">
       <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <div className="container my-5 flex-grow-1">
+      <h1>
+        a
+      </h1>
+      <div className="admin-page-container flex-grow-1">
         <h2 className="mb-4 text-center">Пользователи</h2>
         <div className="mb-4">
           <input
             type="text"
-            className="form-control"
+            className="admin-search-input"
             placeholder="Поиск по имени пользователя..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -60,7 +64,7 @@ const UserListPage = () => {
           <p className="text-center">Пользователи не найдены.</p>
         ) : (
           filteredUsers.map((user) => (
-            <div key={user.id} className="card mb-3 shadow-sm">
+            <div key={user.id} className="admin-card">
               <div className="card-body">
                 <h5 className="card-title">{user.name}</h5>
                 <p className="card-text">

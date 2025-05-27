@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import api from "../services/api";
-import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import "./AddBookPage.css";
 
 const getTokenFromCookies = () => {
@@ -17,24 +18,62 @@ const getTokenFromCookies = () => {
   return null;
 };
 
-const AdminPanel = () => {
-  const [searchTerm, setSearchTerm] = useState("");
+const EditBookPage = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const token = getTokenFromCookies();
+
+  const [bookData, setBookData] = useState(null);
   const [availableTags, setAvailableTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
   const [newTagInput, setNewTagInput] = useState("");
   const [availableGenres, setAvailableGenres] = useState([]);
   const [newGenreInput, setNewGenreInput] = useState("");
 
-  const [newBook, setNewBook] = useState({
+  const [book, setBook] = useState({
     title: "",
     author: "",
     publisher: "",
     releaseDate: "",
     genre: "",
-    availableCopies: "",
+    availableCopies: 0,
     location: "",
     pdf: null,
   });
+
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    if (!token) {
+      alert("Требуется авторизация");
+      navigate("/login");
+      return;
+    }
+
+    api.get(`/books/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        const data = res.data;
+        setBookData(data);
+        setBook({
+          title: data.title,
+          author: data.author,
+          publisher: data.publisher || "",
+          releaseDate: data.releaseDate || "",
+          genre: data.genre?.name || "",
+          availableCopies: data.availableCopies || 0,
+          location: data.location || "",
+          pdf: null,
+        });
+        setSelectedTags(data.tags?.map((tag) => tag.name) || []);
+      })
+      .catch((err) => {
+        console.error("Ошибка загрузки книги", err);
+        alert("Ошибка загрузки книги");
+        navigate("/");
+      });
+  }, [id, navigate, token]);
 
   useEffect(() => {
     api.get("/tags")
@@ -51,25 +90,21 @@ const AdminPanel = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // Если меняется выбранный жанр — очищаем поле нового жанра
     if (name === "genre" && value.trim() !== "") {
       setNewGenreInput("");
     }
 
-    setNewBook((prev) => ({
+    setBook((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // Обработка изменения нового жанра
   const handleNewGenreChange = (e) => {
     const value = e.target.value;
     setNewGenreInput(value);
-
-    // Если введён новый жанр — очищаем выбранный жанр
     if (value.trim() !== "") {
-      setNewBook((prev) => ({
+      setBook((prev) => ({
         ...prev,
         genre: "",
       }));
@@ -77,7 +112,7 @@ const AdminPanel = () => {
   };
 
   const handleFileChange = (e) => {
-    setNewBook((prev) => ({
+    setBook((prev) => ({
       ...prev,
       pdf: e.target.files[0],
     }));
@@ -90,112 +125,102 @@ const AdminPanel = () => {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const token = getTokenFromCookies();
-    if (!token) {
-      alert("You must be logged in as admin to add a book");
+    if (!book.title.trim() || !book.author.trim()) {
+      setMessage("Поля Название и Автор обязательны");
+      return;
+    }
+
+    const genreToSend = newGenreInput.trim() || book.genre;
+    if (!genreToSend) {
+      setMessage("Поле Жанр обязательно");
       return;
     }
 
     const formData = new FormData();
-    // Копируем все поля, кроме genre, чтобы genre добавить отдельно
-    Object.entries(newBook).forEach(([key, value]) => {
-      if (key === "pdf") {
+    Object.entries(book).forEach(([key, value]) => {
+      if (key === "pdf" && value) {
         formData.append("file", value);
       } else if (key !== "genre") {
         formData.append(key, value);
       }
     });
 
-    // Отправляем только один жанр — новый или выбранный
-    const genreToSend = newGenreInput.trim() || newBook.genre;
     formData.append("genre", genreToSend);
-
     selectedTags.forEach((tag) => formData.append("tags", tag));
     if (newTagInput.trim()) {
       formData.append("newTags", newTagInput.trim());
     }
 
-    api.post("/books", formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-      },
-    })
-      .then(() => {
-        alert("Книга успешно добавлена!");
-        setNewBook({
-          title: "",
-          author: "",
-          publisher: "",
-          releaseDate: "",
-          genre: "",
-          availableCopies: "",
-          location: "",
-          pdf: null,
-        });
-        setSelectedTags([]);
-        setNewTagInput("");
-        setNewGenreInput("");
-      })
-      .catch((error) => {
-        console.error("Ошибка при добавлении книги:", error);
-        alert("Не удалось добавить книгу.");
+    try {
+      await api.put(`/books/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
+      setMessage("Книга успешно обновлена!");
+      setTimeout(() => navigate(`/books/${id}`), 1500);
+    } catch (error) {
+      console.error("Ошибка при обновлении книги", error);
+      setMessage("Ошибка при обновлении книги, попробуйте позже");
+    }
   };
 
+  if (!bookData) return <div>Загрузка данных...</div>;
+
   return (
-    <div>
-      <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+    <>
+      <Navbar />
       <h1 style={{ visibility: "hidden" }}>a</h1>
       <div className="admin-panel">
-        <h2>Добавление книги</h2>
+        <h2>Редактирование книги</h2>
         <form className="book-form" onSubmit={handleSubmit}>
           <input
             type="text"
             name="title"
-            placeholder="Название"
-            value={newBook.title}
+            placeholder="Название *"
+            value={book.title}
             onChange={handleChange}
             required
           />
           <input
             type="text"
             name="author"
-            placeholder="Автор"
-            value={newBook.author}
+            placeholder="Автор *"
+            value={book.author}
             onChange={handleChange}
             required
           />
           <input
             type="text"
             name="publisher"
-            placeholder="Издательство"
-            value={newBook.publisher}
+            placeholder="Издатель"
+            value={book.publisher}
             onChange={handleChange}
           />
           <input
             type="text"
             name="releaseDate"
-            placeholder="Дата публикации (yyyy-mm-dd)"
-            value={newBook.releaseDate}
+            placeholder="Дата выхода"
+            value={book.releaseDate}
             onChange={handleChange}
           />
 
-          <select name="genre" value={newBook.genre} onChange={handleChange}>
+          <select name="genre" value={book.genre} onChange={handleChange}>
             <option value="">Выберите жанр</option>
-            {availableGenres.map((genre) => (
-              <option key={genre.id} value={genre.name}>
-                {genre.name}
+            {availableGenres.map((g) => (
+              <option key={g.name} value={g.name}>
+                {g.name}
               </option>
             ))}
           </select>
 
           <input
             type="text"
-            placeholder="Новый жанр"
+            placeholder="Или введите новый жанр"
             value={newGenreInput}
             onChange={handleNewGenreChange}
           />
@@ -203,29 +228,24 @@ const AdminPanel = () => {
           <input
             type="number"
             name="availableCopies"
-            placeholder="Количество экземпляров"
-            value={newBook.availableCopies}
+            placeholder="Доступно экземпляров"
+            min="0"
+            value={book.availableCopies}
             onChange={handleChange}
           />
           <input
             type="text"
             name="location"
             placeholder="Местоположение"
-            value={newBook.location}
+            value={book.location}
             onChange={handleChange}
           />
-          <input
-            type="file"
-            name="file"
-            accept="application/pdf"
-            onChange={handleFileChange}
-          />
 
-          <div className="tags-section">
-            <p>Выберите теги:</p>
-            <div className="checkbox-list">
+          <div className="tag-section">
+            <label>Существующие теги:</label>
+            <div className="tag-list">
               {availableTags.map((tag) => (
-                <label key={tag.id}>
+                <label key={tag.name} className="tag-checkbox">
                   <input
                     type="checkbox"
                     value={tag.name}
@@ -236,20 +256,30 @@ const AdminPanel = () => {
                 </label>
               ))}
             </div>
-            <input
-              type="text"
-              placeholder="Новые теги через ;"
-              value={newTagInput}
-              onChange={(e) => setNewTagInput(e.target.value)}
-            />
           </div>
 
-          <button type="submit">Добавить книгу</button>
+          <input
+            type="text"
+            placeholder="Новые теги (через запятую)"
+            value={newTagInput}
+            onChange={(e) => setNewTagInput(e.target.value)}
+          />
+
+          <label>
+            Заменить PDF-файл:
+            <input type="file" accept="application/pdf" onChange={handleFileChange} />
+          </label>
+
+          <button type="submit" className="submit-btn">
+            Сохранить изменения
+          </button>
+
+          {message && <p className="form-message">{message}</p>}
         </form>
       </div>
       <Footer />
-    </div>
+    </>
   );
 };
 
-export default AdminPanel;
+export default EditBookPage;

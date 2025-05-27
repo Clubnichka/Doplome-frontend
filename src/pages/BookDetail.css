@@ -18,13 +18,6 @@
     width: 280px;
   }
   
-  .detail-cover-img {
-    width: 280px;
-    height: 380px;
-    object-fit: cover;
-    border-radius: 12px;
-    background-color: #eaeaea;
-  }
   .book-detail-cover {
     width: 280px;
     height: 380px;
@@ -32,6 +25,7 @@
     border-radius: 12px;
     background-color: #eaeaea;
   }
+ 
   .book-meta {
     flex-grow: 1;
   }

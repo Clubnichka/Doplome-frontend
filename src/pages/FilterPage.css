@@ -1,0 +1,40 @@
+.admin-panel {
+    max-width: 600px;
+    margin: auto;
+    padding: 2rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .book-form input[type="text"],
+  .book-form input[type="number"] {
+    width: 100%;
+    padding: 0.7rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+  
+  .book-form button {
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  .book-form button:hover {
+    background-color: #2563eb;
+  }
+  
+  .tags-section {
+    margin-bottom: 1rem;
+  }
+  
+  .checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }

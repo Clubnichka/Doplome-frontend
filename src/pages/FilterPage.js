@@ -1,36 +1,39 @@
-import React, { useState } from "react";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Form, Button } from "react-bootstrap";
+import api from "../services/api";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar"; // Импорт навигации
+import Navbar from "../components/Navbar";
+import "./FilterPage.css";
 
-const genres = ["Фантастика", "Детектив", "Роман", "История", "Наука", "Поэзия","Фентези"];
+const genres = ["Фантастика", "Детектив", "Роман", "История", "Наука", "Поэзия", "Фентези"];
 
 const FilterPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGenres, setSelectedGenres] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [availableTags, setAvailableTags] = useState([]);
   const [author, setAuthor] = useState("");
   const [yearFrom, setYearFrom] = useState("");
   const [yearTo, setYearTo] = useState("");
 
+  useEffect(() => {
+    api.get("/tags")
+      .then((res) => setAvailableTags(res.data))
+      .catch((err) => console.error("Ошибка при загрузке тегов:", err));
+  }, []);
+
   const toggleGenre = (genre) => {
     setSelectedGenres((prev) =>
-      prev.includes(genre)
-        ? prev.filter((g) => g !== genre)
-        : [...prev, genre]
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
     );
   };
 
-const availableTags = ["научная","психология","классика", "приключения", "мистика", "юмор", "философия","фантастика","художественная","бестселлер"];
+  const toggleTag = (tagName) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagName) ? prev.filter((t) => t !== tagName) : [...prev, tagName]
+    );
+  };
 
-const [selectedTags, setSelectedTags] = useState([]);
-
-const toggleTag = (tag) => {
-  setSelectedTags((prev) =>
-    prev.includes(tag)
-      ? prev.filter((t) => t !== tag)
-      : [...prev, tag]
-  );
-};
   const handleSearch = () => {
     const queryParams = new URLSearchParams();
     if (selectedGenres.length > 0) queryParams.append("genres", selectedGenres.join(","));
@@ -44,76 +47,72 @@ const toggleTag = (tag) => {
   return (
     <>
       <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <Container className="mt-5 mb-5">
-        <h2>Фильтрация каталога</h2>
-        <Form>
-          <Form.Group>
-            <Form.Label>Жанры:</Form.Label>
-            <Row>
+      <h1>
+        a
+      </h1>
+      <div className="admin-panel">
+        <h2>Фильтрация книг</h2>
+        <Form className="book-form">
+          <div className="tags-section">
+            <p>Жанры:</p>
+            <div className="checkbox-list">
               {genres.map((genre) => (
-                <Col xs={6} md={4} key={genre}>
-                  <Form.Check
+                <label key={genre}>
+                  <input
                     type="checkbox"
-                    label={genre}
+                    value={genre}
                     checked={selectedGenres.includes(genre)}
                     onChange={() => toggleGenre(genre)}
                   />
-                </Col>
+                  {genre}
+                </label>
               ))}
-            </Row>
-          </Form.Group>
-          <Form.Group className="mt-3">
-          <Form.Label>Теги:</Form.Label>
-          <Row>
-            {availableTags.map((tag) => (
-              <Col xs={6} md={4} key={tag}>
-                <Form.Check
-                  type="checkbox"
-                  label={tag}
-                  checked={selectedTags.includes(tag)}
-                  onChange={() => toggleTag(tag)}
-                />
-              </Col>
-            ))}
-          </Row>
-        </Form.Group>
-          <Form.Group className="mt-3">
-            <Form.Label>Автор:</Form.Label>
-            <Form.Control
-              type="text"
-              value={author}
-              onChange={(e) => setAuthor(e.target.value)}
-              placeholder="Введите автора"
+            </div>
+          </div>
+
+          <div className="tags-section">
+            <p>Теги:</p>
+            <div className="checkbox-list">
+              {availableTags.map((tag) => (
+                <label key={tag.id}>
+                  <input
+                    type="checkbox"
+                    value={tag.name}
+                    checked={selectedTags.includes(tag.name)}
+                    onChange={() => toggleTag(tag.name)}
+                  />
+                  {tag.name}
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <input
+            type="text"
+            placeholder="Автор"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+          />
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <input
+              type="number"
+              placeholder="Год от"
+              value={yearFrom}
+              onChange={(e) => setYearFrom(e.target.value)}
             />
-          </Form.Group>
+            <input
+              type="number"
+              placeholder="Год до"
+              value={yearTo}
+              onChange={(e) => setYearTo(e.target.value)}
+            />
+          </div>
 
-          <Form.Group className="mt-3">
-            <Form.Label>Год издания:</Form.Label>
-            <Row>
-              <Col>
-                <Form.Control
-                  type="number"
-                  placeholder="От"
-                  value={yearFrom}
-                  onChange={(e) => setYearFrom(e.target.value)}
-                />
-              </Col>
-              <Col>
-                <Form.Control
-                  type="number"
-                  placeholder="До"
-                  value={yearTo}
-                  onChange={(e) => setYearTo(e.target.value)}
-                />
-              </Col>
-            </Row>
-          </Form.Group>
-
-          <Button className="mt-4" variant="primary" onClick={handleSearch}>
+          <button type="button" onClick={handleSearch}>
             Искать
-          </Button>
+          </button>
         </Form>
-      </Container>
+      </div>
       <Footer />
     </>
   );

@@ -65,27 +65,31 @@ const Navbar = ({ searchTerm, setSearchTerm }) => {
           Фильтр
         </Button>
         {decoded ? (
-          <>
-            <span>👤 {decoded.sub}</span>
-            {isAdmin && (
-              <Button variant="outline-warning" as={Link} to="/admin">
-                Панель админа
-              </Button>
-            )}
-            <Button variant="outline-danger" onClick={handleLogout}>
-              Выйти
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button variant="outline-light" as={Link} to="/login">
-              Вход
-            </Button>
-            <Button variant="outline-light" as={Link} to="/signup">
-              Регистрация
-            </Button>
-          </>
-        )}
+  <>
+    <span>👤 {decoded.sub}</span>
+    {isAdmin ? (
+      <Button variant="outline-warning" as={Link} to="/admin">
+        Панель админа
+      </Button>
+    ) : (
+      <Button variant="outline-info" as={Link} to="/my-bookings">
+        Мои брони
+      </Button>
+    )}
+    <Button variant="outline-danger" onClick={handleLogout}>
+      Выйти
+    </Button>
+  </>
+) : (
+  <>
+    <Button variant="outline-light" as={Link} to="/login">
+      Вход
+    </Button>
+    <Button variant="outline-light" as={Link} to="/signup">
+      Регистрация
+    </Button>
+  </>
+)}
       </div>
     </nav>
   );

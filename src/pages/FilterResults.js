@@ -58,6 +58,9 @@ const FilterResults = () => {
       </h2>
 
       <Container className="mt-5 mb-5" style={{ fontFamily: "Segoe UI, sans-serif" }}>
+      <h2 className="text-center mb-4" style={{ color: "#333" }}>
+        Найдено книг: {total}
+      </h2>
         {books.length === 0 ? (
           <p className="text-center text-muted">Книги не найдены.</p>
         ) : (
